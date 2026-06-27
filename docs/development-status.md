@@ -43,24 +43,29 @@ Implemented:
 - merged table warning diagnostics
 - basic hyperlink rendering
 - image relationship discovery and summary metadata
+- image asset export through optional `--assets-dir`
 - speaker notes extraction
 - shape-text block rendering for ordinary preset shapes
 - unsupported chart, SmartArt, comments, video, audio, and OLE diagnostics
 - Markdown output
 - summary text and summary JSON output
-- CLI `--help`, `--version`, `--out`, `--summary`, `--summary-out`,
-  `--summary-json-out`, `--no-notes`, `--debug`, and `--verbose`
+- CLI `--help`, `--version`, `--out`, `--assets-dir`, `--summary`,
+  `--summary-out`, `--summary-json-out`, `--no-notes`, `--debug`, and
+  `--verbose`
 - release workflow for CLI runtime assets
 - representative Node core and CLI test intent coverage for `0.2.0`
-- direct Node / Java CLI output comparison script for representative fixtures
+- direct Node / Java CLI output comparison script for the checked upstream
+  generated fixture set, including Markdown, summary JSON, asset manifest, and
+  asset bytes
 
 Not yet implemented:
 
-- byte-level Node / Java parity checks
+- exhaustive parity checks for future upstream fixtures or broader real-world
+  PPTX files
 
 Phase 2:
 
-- asset file export through optional `--assets-dir`
+- continue broadening parity checks when upstream adds fixtures or behavior
 
 ## Verification
 

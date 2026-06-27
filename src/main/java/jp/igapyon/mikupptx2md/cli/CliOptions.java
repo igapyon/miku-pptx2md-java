@@ -3,6 +3,7 @@ package jp.igapyon.mikupptx2md.cli;
 class CliOptions {
   String inputPath;
   String outPath;
+  String assetsDirPath;
   String summaryOutPath;
   String summaryJsonOutPath;
   boolean summary;
@@ -52,7 +53,7 @@ class CliOptions {
       } else if ("--summary-json-out".equals(arg)) {
         options.summaryJsonOutPath = requireValue(args, ++i, arg);
       } else if ("--assets-dir".equals(arg)) {
-        throw new IllegalArgumentException("--assets-dir is planned for the phase 2 parity pass.");
+        options.assetsDirPath = requireValue(args, ++i, arg);
       } else {
         throw new IllegalArgumentException("Unknown option: " + arg);
       }

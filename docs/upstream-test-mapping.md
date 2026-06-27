@@ -36,6 +36,12 @@ The first Java CLI parity slice follows these upstream Node CLI test intents:
 - verbose diagnostics are written to stderr
 - structured summary JSON is written to a requested path
 - debug mode includes diagnostic comments in Markdown
+- `--assets-dir` writes image assets, `manifest.json`, and relative Markdown
+  image links
+
+The comparison script generates the checked upstream fixture set and compares
+Node / Java Markdown plus summary JSON. It also compares `--assets-dir`
+Markdown, `manifest.json`, and written image bytes for the image fixture.
 
 Focused command:
 

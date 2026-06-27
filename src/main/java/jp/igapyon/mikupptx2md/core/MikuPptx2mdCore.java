@@ -63,6 +63,15 @@ public class MikuPptx2mdCore {
     return builder.toString();
   }
 
+  public String createPptx2MdAssetsManifestJsonText(List<Pptx2MdAsset> assets) {
+    StringBuilder builder = new StringBuilder();
+    builder.append("{\n");
+    builder.append("  \"version\": 1,\n");
+    builder.append("  \"assets\": ").append(assetsManifestToJson(assets, 2)).append('\n');
+    builder.append("}\n");
+    return builder.toString();
+  }
+
   private static int summaryValue(Pptx2MdSummary summary, String field) {
     if ("slides".equals(field)) return summary.slides;
     if ("slidesWithTitles".equals(field)) return summary.slidesWithTitles;
@@ -413,7 +422,7 @@ public class MikuPptx2mdCore {
       }
       builder.append("\n\n");
       for (SlideBlock block : slide.blocks) {
-        block.appendMarkdown(builder);
+        block.appendMarkdown(builder, options);
       }
       if (options.includeNotes && !slide.notes.isEmpty()) {
         builder.append("### Speaker Notes\n\n");
@@ -565,7 +574,7 @@ public class MikuPptx2mdCore {
     }
     if (Pattern.compile("<[^<\\s:]*:?oleObj\\b").matcher(pictureXml).find()) {
       return new Pptx2MdDiagnostic("warning", "unsupported-ole-object",
-          "Unsupported PowerPoint OLE picture object was omitted from Markdown output.", slidePath);
+          "Unsupported PowerPoint ole-object picture object was omitted from Markdown output.", slidePath);
     }
     return null;
   }
@@ -747,6 +756,38 @@ public class MikuPptx2mdCore {
     return builder.toString();
   }
 
+  private static String assetsManifestToJson(List<Pptx2MdAsset> assets, int indent) {
+    if (assets.isEmpty()) return "[]";
+    String pad = spaces(indent);
+    String childPad = spaces(indent + 2);
+    String grandChildPad = spaces(indent + 4);
+    String positionPad = spaces(indent + 6);
+    StringBuilder builder = new StringBuilder();
+    builder.append("[\n");
+    for (int i = 0; i < assets.size(); i++) {
+      Pptx2MdAsset asset = assets.get(i);
+      if (i > 0) builder.append(",\n");
+      builder.append(childPad).append("{\n");
+      builder.append(grandChildPad).append("\"kind\": \"image\",\n");
+      builder.append(grandChildPad).append("\"sourcePath\": ").append(json(asset.sourcePath)).append(",\n");
+      builder.append(grandChildPad).append("\"mediaType\": ").append(json(asset.mediaType)).append(",\n");
+      builder.append(grandChildPad).append("\"altText\": ").append(json(asset.altText)).append(",\n");
+      builder.append(grandChildPad).append("\"sourceTrace\": ").append(json(asset.sourceTrace)).append(",\n");
+      builder.append(grandChildPad).append("\"slideIndex\": ").append(asset.slideIndex).append(",\n");
+      builder.append(grandChildPad).append("\"blockIndex\": ").append(asset.blockIndex).append(",\n");
+      builder.append(grandChildPad).append("\"relationshipId\": ").append(json(asset.relationshipId)).append(",\n");
+      builder.append(grandChildPad).append("\"size\": ").append(asset.bytes == null ? 0 : asset.bytes.length).append(",\n");
+      builder.append(grandChildPad).append("\"documentPosition\": {\n");
+      builder.append(positionPad).append("\"slideIndex\": ").append(asset.slideIndex).append(",\n");
+      builder.append(positionPad).append("\"blockIndex\": ").append(asset.blockIndex).append(",\n");
+      builder.append(positionPad).append("\"blockKind\": \"image\"\n");
+      builder.append(grandChildPad).append("}\n");
+      builder.append(childPad).append('}');
+    }
+    builder.append('\n').append(pad).append(']');
+    return builder.toString();
+  }
+
   private static String json(String value) {
     StringBuilder builder = new StringBuilder();
     builder.append('"');
@@ -806,7 +847,7 @@ public class MikuPptx2mdCore {
   }
 
   private interface SlideBlock {
-    void appendMarkdown(StringBuilder builder);
+    void appendMarkdown(StringBuilder builder, Pptx2MdOptions options);
     int textBlockCount();
     int listItemCount();
     int tableCount();
@@ -820,7 +861,7 @@ public class MikuPptx2mdCore {
       this.paragraph = paragraph;
     }
 
-    public void appendMarkdown(StringBuilder builder) {
+    public void appendMarkdown(StringBuilder builder, Pptx2MdOptions options) {
       if ("ordered".equals(paragraph.listKind)) {
         builder.append(repeat("  ", paragraph.level)).append("1. ").append(paragraph.markdown).append("\n");
       } else if ("bullet".equals(paragraph.listKind)) {
@@ -857,7 +898,7 @@ public class MikuPptx2mdCore {
       this.paragraphs = paragraphs;
     }
 
-    public void appendMarkdown(StringBuilder builder) {
+    public void appendMarkdown(StringBuilder builder, Pptx2MdOptions options) {
       for (int i = 0; i < paragraphs.size(); i++) {
         TextParagraph paragraph = paragraphs.get(i);
         builder.append("> ");
@@ -903,7 +944,7 @@ public class MikuPptx2mdCore {
       this.diagnostic = diagnostic;
     }
 
-    public void appendMarkdown(StringBuilder builder) {
+    public void appendMarkdown(StringBuilder builder, Pptx2MdOptions options) {
       int width = 0;
       for (List<String> row : rows) {
         width = Math.max(width, row.size());
@@ -949,9 +990,15 @@ public class MikuPptx2mdCore {
       this.asset = asset;
     }
 
-    public void appendMarkdown(StringBuilder builder) {
-      builder.append("[Image: ").append(asset.altText == null || asset.altText.length() == 0 ? asset.sourcePath : asset.altText)
-          .append("]\n\n");
+    public void appendMarkdown(StringBuilder builder, Pptx2MdOptions options) {
+      String altText = asset.altText == null || asset.altText.length() == 0 ? asset.sourcePath : asset.altText;
+      String imagePath = options.imagePathResolver == null ? "" : options.imagePathResolver.apply(asset);
+      if (imagePath == null || imagePath.length() == 0) {
+        builder.append("[Image: ").append(altText).append("]\n\n");
+      } else {
+        builder.append("![").append(escapeMarkdownLinkLabel(altText)).append("](")
+            .append(escapeMarkdownLinkDestination(imagePath)).append(")\n\n");
+      }
     }
 
     public int textBlockCount() {

@@ -116,6 +116,18 @@ class MikuPptx2mdNodeIntentTest {
     assertEquals("picture:image(ppt/media/image1.png):alt(Diagram alt)", result.assets.get(0).sourceTrace);
     assertArrayEquals(new byte[] {(byte) 137, 80, 78, 71}, result.assets.get(0).bytes);
     assertEquals(1, result.summary.imageAssets);
+
+    Pptx2MdOptions options = new Pptx2MdOptions();
+    options.title = "image-sample";
+    options.imagePathResolver = asset -> "assets/" + asset.sourcePath;
+    Pptx2MdResult linked = core.convertPptxToMarkdown(PptxFixtures.image(), options);
+    assertTrue(linked.markdown.contains("![Diagram alt](assets/ppt/media/image1.png)"));
+
+    String manifest = core.createPptx2MdAssetsManifestJsonText(result.assets);
+    assertTrue(manifest.contains("\"version\": 1"));
+    assertTrue(manifest.contains("\"sourcePath\": \"ppt/media/image1.png\""));
+    assertTrue(manifest.contains("\"documentPosition\": {"));
+    assertTrue(manifest.contains("\"blockKind\": \"image\""));
   }
 
   @Test

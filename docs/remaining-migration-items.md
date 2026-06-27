@@ -10,12 +10,15 @@
 - Added representative Node core test intent coverage for `0.2.0`.
 - Added representative Node CLI test intent coverage for `0.2.0`.
 - Added CLI runtime release workflow.
+- Ported asset path safety and implemented optional `--assets-dir`.
+- Expanded the Node / Java CLI comparison script across the checked upstream
+  generated fixture set.
+- Added summary JSON comparison for the checked upstream generated fixture set.
 
 ## Pending Parity Work
 
-- Expand the Node / Java parity script beyond the representative fixture slice.
-- Compare summary JSON field order and escaping against upstream output.
-- Phase 2: port asset path safety and implement optional `--assets-dir`.
+- Keep expanding Node / Java parity checks when upstream adds new fixtures or
+  PPTX feature behavior.
 
 ## Out Of Initial Scope
 
