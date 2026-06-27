@@ -52,10 +52,10 @@ Implemented:
   `--summary-json-out`, `--no-notes`, `--debug`, and `--verbose`
 - release workflow for CLI runtime assets
 - representative Node core and CLI test intent coverage for `0.2.0`
+- direct Node / Java CLI output comparison script for representative fixtures
 
 Not yet implemented:
 
-- direct Node / Java CLI output parity script
 - byte-level Node / Java parity checks
 
 Phase 2:
