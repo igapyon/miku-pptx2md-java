@@ -7,13 +7,17 @@
 - Added CLI and core package structure.
 - Added initial upstream and sister-reference documents.
 - Added focused core and CLI tests.
-- Added representative Node core test intent coverage for `0.2.0`.
-- Added representative Node CLI test intent coverage for `0.2.0`.
+- Added representative Node core test intent coverage for the checked upstream
+  Node `0.4.0`.
+- Added representative Node CLI test intent coverage for the checked upstream
+  Node `0.4.0`.
 - Added CLI runtime release workflow.
 - Ported asset path safety and implemented optional `--assets-dir`.
 - Expanded the Node / Java CLI comparison script across the checked upstream
   generated fixture set.
 - Added summary JSON comparison for the checked upstream generated fixture set.
+- Bumped the Java runtime version to `0.4.0` after phase 2 parity tightening
+  against the checked upstream Node `0.4.0`.
 
 ## Pending Parity Work
 

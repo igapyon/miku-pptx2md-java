@@ -9,12 +9,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 public class MikuPptx2mdCli {
-  public static final String VERSION = "0.2.0";
+  public static final String VERSION = "0.4.0";
 
   public static void main(String[] args) {
     int exitCode = new MikuPptx2mdCli().run(args, System.out, System.err);
@@ -41,7 +42,7 @@ public class MikuPptx2mdCli {
       verbose(err, options, startedAt, "summary=" + (options.summaryOutPath == null ? (options.summary ? "stdout" : "disabled") : options.summaryOutPath));
       verbose(err, options, startedAt, "summary-json=" + (options.summaryJsonOutPath == null ? "disabled" : options.summaryJsonOutPath));
       verbose(err, options, startedAt, "assets=" + (options.assetsDirPath == null ? "disabled" : options.assetsDirPath));
-      byte[] inputBytes = Files.readAllBytes(Paths.get(options.inputPath));
+      byte[] inputBytes = readInputBytes(options.inputPath);
       verbose(err, options, startedAt, "input-bytes=" + inputBytes.length);
       Pptx2MdOptions coreOptions = new Pptx2MdOptions();
       coreOptions.fallbackTitle = inputStem(options.inputPath);
@@ -95,6 +96,16 @@ public class MikuPptx2mdCli {
         Files.createDirectories(parent);
       }
       Files.write(outputPath, asset.bytes == null ? new byte[0] : asset.bytes);
+    }
+  }
+
+  private static byte[] readInputBytes(String inputPath) throws IOException {
+    try {
+      return Files.readAllBytes(Paths.get(inputPath));
+    } catch (NoSuchFileException e) {
+      throw new IOException("[" + inputPath + "] read failed: " + e.getMessage(), e);
+    } catch (IOException e) {
+      throw new IOException("[" + inputPath + "] read failed: " + e.getMessage(), e);
     }
   }
 

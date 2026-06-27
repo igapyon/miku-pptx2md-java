@@ -23,21 +23,22 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - The runtime currently supports minimal PPTX ZIP/XML conversion, metadata,
   slide text, basic tables, hyperlinks, image references, `--assets-dir` asset
   export, notes, summary text, and summary JSON.
-- Representative Node core test intent coverage has been added for `0.2.0`.
-- Representative Node CLI test intent coverage has been added for `0.2.0`.
+- Representative Node core test intent coverage has been added for the checked
+  upstream Node `0.4.0`.
+- Representative Node CLI test intent coverage has been added for the checked
+  upstream Node `0.4.0`.
 - The CLI runtime release workflow has been added.
 - The active goal is now first-version completion, not just scaffold
   completion.
-- First-version `0.2.0` work is complete except for human review and release
-  publication.
+- First-version `0.2.0` work is complete. Java `0.4.0` now tracks the checked
+  upstream Node `0.4.0` package version.
 - Local tag `v0.2.0` has been created.
-- The intended second phase is to make the Java version as close as practical
-  to the upstream Node version.
+- The intended next release tag is `v0.4.0` if this version bump is published.
 
 ## Next Action
 
-- Review the committed first-version state.
-- Push local tag `v0.2.0` if the release should be published.
+- Review the Java `0.4.0` parity state.
+- Create and push local tag `v0.4.0` if the release should be published.
 - Continue broadening parity checks beyond the current representative fixture
   slice.
 - Keep parity comparison work visible so phase 2 can tighten behavior against
@@ -66,11 +67,12 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Last Verification
 
-- `mvn test`: passed, 19 tests on 2026-06-27.
-- `mvn package`: passed, 19 tests on 2026-06-27; runtime jar and sources jar
+- `mvn test`: passed, 20 tests on 2026-06-27.
+- `mvn package`: passed, 20 tests on 2026-06-27; runtime jar and sources jar
   generated.
-- `java -jar target/miku-pptx2md-0.2.0.jar --version`: printed
-  `miku-pptx2md 0.2.0`.
+- `java -jar target/miku-pptx2md-0.4.0.jar --version`: printed
+  `miku-pptx2md 0.4.0`.
 - `sh scripts/compare-node-java-cli.sh`: passed for the checked upstream
-  generated fixture set, summary JSON, and `--assets-dir` image asset output on
-  2026-06-27.
+  generated fixture set, summary text, summary JSON, stdout Markdown,
+  `--no-notes`, `--debug`, metadata rejection, read failures, and
+  `--assets-dir` image asset output on 2026-06-27.

@@ -51,6 +51,13 @@ Update this section while working. Do not rewrite unrelated TODO items.
   generated fixture set, including Markdown and summary JSON.
 - [x] Compare `--assets-dir` Markdown, manifest JSON, and written image bytes
   against the upstream Node CLI.
+- [x] Start phase 2 parity tightening by expanding the Node / Java CLI
+  comparison command to cover summary text, stdout Markdown, `--no-notes`,
+  `--debug`, metadata command rejection, and read-failure behavior.
+- [x] Align Java CLI read-failure diagnostics with the upstream Node
+  `[input] read failed:` message shape.
+- [x] Bump the Java runtime version to `0.4.0` to align with the checked
+  upstream Node package version.
 
 ### Blockers
 

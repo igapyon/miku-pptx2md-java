@@ -26,7 +26,7 @@ class MikuPptx2mdCliTest {
     int exitCode = new MikuPptx2mdCli().run(new String[] {"--version"}, new PrintStream(out), new PrintStream(err));
 
     assertEquals(0, exitCode);
-    assertTrue(out.toString().contains("miku-pptx2md 0.2.0"));
+    assertTrue(out.toString().contains("miku-pptx2md 0.4.0"));
     assertEquals("", err.toString());
   }
 
@@ -39,6 +39,18 @@ class MikuPptx2mdCliTest {
 
     assertEquals(1, exitCode);
     assertTrue(err.toString().contains("Use --help or --version without other arguments."));
+  }
+
+  @Test
+  void reportsReadFailureWithInputNameAndStage() {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ByteArrayOutputStream err = new ByteArrayOutputStream();
+
+    int exitCode = new MikuPptx2mdCli().run(new String[] {"does-not-exist.pptx"}, new PrintStream(out), new PrintStream(err));
+
+    assertEquals(1, exitCode);
+    assertEquals("", out.toString());
+    assertTrue(err.toString().contains("[does-not-exist.pptx] read failed:"));
   }
 
   @Test

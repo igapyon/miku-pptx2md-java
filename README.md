@@ -30,8 +30,8 @@ remaining parity work in `TODO.md` and `docs/remaining-migration-items.md`.
 
 ## First-Version Scope
 
-The `0.2.0` first usable Java version targets representative behavior from the
-checked Node version:
+The current `0.4.0` Java version follows the checked upstream Node `0.4.0`
+version's representative behavior:
 
 - Markdown sections for ordered slides
 - metadata title fallback and metadata summary output
@@ -69,19 +69,19 @@ The executable CLI jar is produced under `target/`.
 ## Java CLI
 
 ```bash
-java -jar target/miku-pptx2md-0.2.0.jar ./sample.pptx --out ./sample.md
+java -jar target/miku-pptx2md-0.4.0.jar ./sample.pptx --out ./sample.md
 ```
 
 When `--out` is omitted, Markdown is written to stdout.
 
 ```bash
-java -jar target/miku-pptx2md-0.2.0.jar ./sample.pptx > ./sample.md
+java -jar target/miku-pptx2md-0.4.0.jar ./sample.pptx > ./sample.md
 ```
 
 Summary outputs:
 
 ```bash
-java -jar target/miku-pptx2md-0.2.0.jar \
+java -jar target/miku-pptx2md-0.4.0.jar \
   ./sample.pptx \
   --out ./sample.md \
   --summary-out ./sample.summary.txt \

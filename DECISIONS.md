@@ -97,3 +97,16 @@ is added.
 影響:
 Before finalizing `0.2.0`, add the CLI runtime release workflow and verify it
 matches the single-module runtime jar shape.
+
+## 2026-06-27: Align Java Runtime Version To Upstream Node 0.4.0
+
+理由:
+After phase 2 parity tightening, the Java CLI/core behavior is checked against
+the upstream Node `0.4.0` generated fixture set and representative CLI behavior.
+The Java runtime should communicate that it follows the checked upstream package
+version instead of remaining on the earlier first-usable Java milestone number.
+
+影響:
+The Maven project version, Java CLI `--version`, jar examples, and current
+status documents move from `0.2.0` to `0.4.0`. The existing `v0.2.0` tag remains
+the first usable Java milestone. A future publication should use `v0.4.0`.
