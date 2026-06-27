@@ -21,8 +21,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - Maven build, Java core, CLI, tests, README, miku-soft reference, upstream
   mapping docs, and migration notes are committed.
 - The runtime currently supports minimal PPTX ZIP/XML conversion, metadata,
-  slide text, basic tables, hyperlinks, image references, notes, summary text,
-  and summary JSON.
+  slide text, basic tables, hyperlinks, image references, `--assets-dir` asset
+  export, notes, summary text, and summary JSON.
 - Representative Node core test intent coverage has been added for `0.2.0`.
 - Representative Node CLI test intent coverage has been added for `0.2.0`.
 - The CLI runtime release workflow has been added.
@@ -38,7 +38,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 - Review the committed first-version state.
 - Push local tag `v0.2.0` if the release should be published.
-- Keep optional `--assets-dir` in phase 2.
+- Continue broadening parity checks beyond the current representative fixture
+  slice.
 - Keep parity comparison work visible so phase 2 can tighten behavior against
   the Node version.
 
@@ -54,8 +55,9 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Watch Outs
 
-- `--assets-dir` is optional in the Node CLI and is not required for the first
-  usable Java version; it is currently assigned to phase 2.
+- `--assets-dir` is now implemented for sidecar image export and manifest
+  output. The comparison script covers the checked upstream generated fixture
+  set, but not every possible real-world PPTX behavior.
 - The current tests use generated minimal PPTX fixtures, not upstream fixture
   parity.
 - Feature scope should be checked against the Node implementation and tests
@@ -64,10 +66,11 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 ## Last Verification
 
-- `mvn test`: passed, 18 tests on 2026-06-27.
-- `mvn package`: passed, 18 tests on 2026-06-27; runtime jar and sources jar
+- `mvn test`: passed, 19 tests on 2026-06-27.
+- `mvn package`: passed, 19 tests on 2026-06-27; runtime jar and sources jar
   generated.
 - `java -jar target/miku-pptx2md-0.2.0.jar --version`: printed
   `miku-pptx2md 0.2.0`.
-- `sh scripts/compare-node-java-cli.sh`: passed for representative upstream
-  fixtures on 2026-06-27.
+- `sh scripts/compare-node-java-cli.sh`: passed for the checked upstream
+  generated fixture set, summary JSON, and `--assets-dir` image asset output on
+  2026-06-27.

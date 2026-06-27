@@ -21,7 +21,8 @@ Initial Java runtime support includes:
 - extracting title placeholders and basic slide text
 - basic list, table, hyperlink, image reference, speaker notes, and diagnostics
   handling based on representative Node test intent
-- writing Markdown, summary text, and summary JSON from the CLI
+- writing Markdown, sidecar image assets, summary text, and summary JSON from
+  the CLI
 
 The upstream TypeScript / Node.js implementation remains the semantic source of
 truth. The Java implementation is intentionally small at this stage and records
@@ -40,16 +41,16 @@ checked Node version:
 - simple Markdown tables and merged-table warning diagnostics
 - speaker notes by default, with `--no-notes` support
 - image relationship discovery and image summary metadata
+- sidecar image asset export with `--assets-dir` and `manifest.json`
 - unsupported chart, SmartArt, comments, video, audio, and OLE diagnostics
 - summary text and summary JSON outputs
 - agent-readable CLI help, version, verbose output, and debug comments
 
 Known first-version differences:
 
-- `--assets-dir` is optional in the Node CLI and is planned for phase 2.
 - Direct byte-level Node / Java output parity is not yet claimed.
-- The current parity tests follow representative Node fixture intent rather
-  than running the Node and Java CLIs side by side.
+- The current parity tests and comparison script cover the checked upstream
+  generated fixture set rather than every possible real-world PPTX feature.
 
 ## Requirements
 
@@ -90,6 +91,7 @@ java -jar target/miku-pptx2md-0.2.0.jar \
 CLI options:
 
 - `--out <file>`: Write Markdown to this file
+- `--assets-dir <dir>`: Export resolved embedded image assets and `manifest.json`
 - `--summary`: Print summary text to stdout
 - `--summary-out <file>`: Write summary text to this file
 - `--summary-json-out <file>`: Write structured summary JSON to this file
@@ -99,8 +101,9 @@ CLI options:
 - `--version`: Show product name and version
 - `--help`: Show help
 
-`--assets-dir` is part of the upstream Node CLI contract but is optional and is
-planned for the phase 2 parity pass.
+Asset export writes package-relative paths under the requested directory, such
+as `ppt/media/image1.png`, and renders Markdown image links relative to
+`--out`, or to the current directory when `--out` is omitted.
 
 ## Maven Plugin
 

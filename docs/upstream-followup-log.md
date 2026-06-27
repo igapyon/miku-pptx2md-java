@@ -7,4 +7,5 @@
 - Used `miku-xlsx2md-java` and `miku-docx2md-java` as same-layer Java sister
   references.
 - Created the initial Java runtime as a partial straight conversion.
-- Recorded `--assets-dir` and full parity checks as follow-up work.
+- Implemented `--assets-dir` asset export and kept broader full parity checks
+  as follow-up work.
