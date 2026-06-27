@@ -53,10 +53,13 @@ Implemented:
   `--summary-out`, `--summary-json-out`, `--no-notes`, `--debug`, and
   `--verbose`
 - release workflow for CLI runtime assets
-- representative Node core and CLI test intent coverage for `0.2.0`
+- representative Node core and CLI test intent coverage for the checked
+  upstream Node `0.4.0`
 - direct Node / Java CLI output comparison script for the checked upstream
   generated fixture set, including Markdown, summary JSON, asset manifest, and
   asset bytes
+- phase 2 CLI parity checks for summary text, stdout Markdown, `--no-notes`,
+  `--debug`, metadata command rejection, and read-failure diagnostics
 
 Not yet implemented:
 
@@ -74,6 +77,6 @@ Primary command:
 ```bash
 mvn test
 mvn package
-java -jar target/miku-pptx2md-0.2.0.jar --version
+java -jar target/miku-pptx2md-0.4.0.jar --version
 sh scripts/compare-node-java-cli.sh
 ```

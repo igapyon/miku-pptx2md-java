@@ -17,15 +17,17 @@ Read this before starting work, before deciding that work is complete, and whene
 
 ## Objective
 
-Complete `miku-pptx2md-java` `0.2.0` as the first usable Java version and Java
-companion of the upstream TypeScript / Node.js `miku-pptx2md` project.
+Maintain `miku-pptx2md-java` as the Java companion of the upstream TypeScript /
+Node.js `miku-pptx2md` project. The current Java runtime version is `0.4.0`,
+aligned with the checked upstream Node package version.
 
 The first version should be good enough for local Java CLI use, basic
 automation, and continued upstream-following maintenance. It does not need to
 claim complete Node / Java parity for every PowerPoint feature.
 
-After the first usable version is complete, the next goal is to move the Java
-runtime as close as practical to the current Node version's CLI/core behavior.
+The first usable Java `0.2.0` milestone is complete. The current goal is to keep
+the Java runtime as close as practical to the current Node version's CLI/core
+behavior.
 
 ## Done
 
@@ -46,19 +48,21 @@ runtime as close as practical to the current Node version's CLI/core behavior.
   upstream snapshot, sister references, mappings, remaining work, and
   verification commands.
 - `mvn test`, `mvn package`, and runtime jar smoke commands pass.
-- A release workflow is present before the final `0.2.0` release.
-- Remaining non-first-version parity work is explicitly listed in `TODO.md` or
+- A release workflow is present for CLI runtime release assets.
+- Java `0.4.0` follows the checked upstream Node `0.4.0` representative
+  fixture and CLI behavior.
+- Remaining parity work is explicitly listed in `TODO.md` or
   `docs/remaining-migration-items.md`.
 
-## Next Goal After First Version
+## Next Goal
 
 - Bring Java behavior as close as practical to the upstream Node version.
 - Expand Node / Java parity fixtures and comparison scripts.
 - Resolve or explicitly document remaining differences in Markdown output,
   summary JSON, diagnostics, asset manifest output, and supported PPTX feature
   handling.
-- Implement optional upstream CLI features such as `--assets-dir`; this is
-  phase 2 unless explicitly pulled forward later.
+- Keep the Java runtime version aligned when the checked upstream Node package
+  version is intentionally adopted.
 
 ## Stop
 

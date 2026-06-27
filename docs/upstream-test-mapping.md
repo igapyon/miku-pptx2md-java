@@ -6,10 +6,10 @@
 | Core summary text exposes metadata and counts | `MikuPptx2mdCoreTest.createsSummaryText` | Initial Java fixture |
 | CLI `--version` contract | `MikuPptx2mdCliTest.printsVersion` | Covered |
 | CLI metadata command exclusivity | `MikuPptx2mdCliTest.rejectsMixedVersion` | Covered |
-| Node fixture parity from `tests/pptx2md-core.test.mjs` | `MikuPptx2mdNodeIntentTest` | Representative `0.2.0` slice covered |
-| Node CLI output parity from `tests/pptx2md-cli.test.mjs` | `MikuPptx2mdCliTest` | Representative `0.2.0` slice covered |
+| Node fixture parity from `tests/pptx2md-core.test.mjs` | `MikuPptx2mdNodeIntentTest` | Representative upstream `0.4.0` slice covered |
+| Node CLI output parity from `tests/pptx2md-cli.test.mjs` | `MikuPptx2mdCliTest` | Representative upstream `0.4.0` slice covered |
 
-## Representative `0.2.0` Node Intent Slice
+## Representative Upstream 0.4.0 Node Intent Slice
 
 The first Java parity slice follows these upstream Node test intents:
 
@@ -40,8 +40,10 @@ The first Java CLI parity slice follows these upstream Node CLI test intents:
   image links
 
 The comparison script generates the checked upstream fixture set and compares
-Node / Java Markdown plus summary JSON. It also compares `--assets-dir`
-Markdown, `manifest.json`, and written image bytes for the image fixture.
+Node / Java Markdown, summary text, and summary JSON. It also compares stdout
+Markdown, `--no-notes`, `--debug`, metadata command rejection, read-failure
+diagnostics, and `--assets-dir` Markdown, `manifest.json`, and written image
+bytes for the image fixture.
 
 Focused command:
 
