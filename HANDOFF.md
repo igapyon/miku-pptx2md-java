@@ -19,7 +19,7 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 
 - Initial `miku-pptx2md-java` repository scaffold has been created.
 - Maven build, Java core, CLI, tests, README, miku-soft reference, upstream
-  mapping docs, and migration notes exist as untracked files.
+  mapping docs, and migration notes are committed.
 - The runtime currently supports minimal PPTX ZIP/XML conversion, metadata,
   slide text, basic tables, hyperlinks, image references, notes, summary text,
   and summary JSON.
@@ -28,15 +28,16 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - The CLI runtime release workflow has been added.
 - The active goal is now first-version completion, not just scaffold
   completion.
-- First-version `0.2.0` work is complete except for human review, commit, tag,
-  and release publication.
+- First-version `0.2.0` work is complete except for human review and release
+  publication.
+- Local tag `v0.2.0` has been created.
 - The intended second phase is to make the Java version as close as practical
   to the upstream Node version.
 
 ## Next Action
 
-- Review the untracked scaffold and commit when ready.
-- Tag `v0.2.0` after commit if the release should be published.
+- Review the committed first-version state.
+- Push local tag `v0.2.0` if the release should be published.
 - Keep optional `--assets-dir` in phase 2.
 - Keep parity comparison work visible so phase 2 can tighten behavior against
   the Node version.
@@ -59,13 +60,14 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
   parity.
 - Feature scope should be checked against the Node implementation and tests
   before adding Java-only behavior.
-- `git status` currently shows the new scaffold as untracked files.
+- `git status` should be clean before tagging or release publication.
 
 ## Last Verification
 
-- `mvn test`: passed, 18 tests.
-- `mvn package`: passed, 18 tests; runtime jar and sources jar generated.
+- `mvn test`: passed, 18 tests on 2026-06-27.
+- `mvn package`: passed, 18 tests on 2026-06-27; runtime jar and sources jar
+  generated.
 - `java -jar target/miku-pptx2md-0.2.0.jar --version`: printed
   `miku-pptx2md 0.2.0`.
 - `sh scripts/compare-node-java-cli.sh`: passed for representative upstream
-  fixtures.
+  fixtures on 2026-06-27.
