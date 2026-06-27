@@ -37,7 +37,7 @@ The Java `--help` output follows the upstream Node agent-readable help shape:
 
 Known intentional differences:
 
-- Version output uses the Java runtime version, currently `0.4.0`, matching the
-  checked upstream Node package version.
+- Version output uses the Java runtime version, currently `0.4.1`. The checked
+  upstream Node package version for this mapping remains `0.4.0`.
 - Help examples use Java jar invocation rather than
   `node scripts/miku-pptx2md-cli.mjs`.

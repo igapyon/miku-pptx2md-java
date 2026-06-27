@@ -30,19 +30,20 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - The CLI runtime release workflow has been added.
 - The active goal is now first-version completion, not just scaffold
   completion.
-- First-version `0.2.0` work is complete. Java `0.4.0` now tracks the checked
-  upstream Node `0.4.0` package version.
+- First-version `0.2.0` work is complete. Java `0.4.0` tracked the checked
+  upstream Node `0.4.0` package version. Java `0.4.1` is now the current
+  refactoring patch version.
+- Report generation has been extracted from `MikuPptx2mdCore` into
+  `Pptx2MdReportWriter`.
 - Local tag `v0.2.0` has been created.
 - The intended next release tag is `v0.4.0` if this version bump is published.
 
 ## Next Action
 
-- Review the Java `0.4.0` parity state.
-- Create and push local tag `v0.4.0` if the release should be published.
-- Continue broadening parity checks beyond the current representative fixture
-  slice.
-- Keep parity comparison work visible so phase 2 can tighten behavior against
-  the Node version.
+- Continue staged refactoring from `GOAL.md`.
+- Extract PPTX package / relationship reading next, preserving the public
+  `MikuPptx2mdCore` API and current CLI behavior.
+- Run `mvn test` after each refactoring step.
 
 ## Relevant Files
 
@@ -51,7 +52,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - `DECISIONS.md`: important design decisions and deferred work.
 - `README.md`: current user-facing Java runtime usage.
 - `docs/remaining-migration-items.md`: parity and migration backlog.
-- `src/main/java/jp/igapyon/mikupptx2md/core/MikuPptx2mdCore.java`: current core implementation.
+- `src/main/java/jp/igapyon/mikupptx2md/core/MikuPptx2mdCore.java`: current core orchestration and remaining PPTX extraction implementation.
+- `src/main/java/jp/igapyon/mikupptx2md/core/Pptx2MdReportWriter.java`: summary, summary JSON, and asset manifest writer.
 - `src/main/java/jp/igapyon/mikupptx2md/cli/MikuPptx2mdCli.java`: current CLI implementation.
 
 ## Watch Outs
@@ -63,6 +65,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
   parity.
 - Feature scope should be checked against the Node implementation and tests
   before adding Java-only behavior.
+- Keep refactoring commits behavior-preserving; use existing tests before
+  widening PPTX feature scope.
 - `git status` should be clean before tagging or release publication.
 
 ## Last Verification
@@ -70,8 +74,8 @@ Keep it concise. Do not use this as a full work log or a replacement for `TODO.m
 - `mvn test`: passed, 20 tests on 2026-06-27.
 - `mvn package`: passed, 20 tests on 2026-06-27; runtime jar and sources jar
   generated.
-- `java -jar target/miku-pptx2md-0.4.0.jar --version`: printed
-  `miku-pptx2md 0.4.0`.
+- `java -jar target/miku-pptx2md-0.4.1.jar --version`: printed
+  `miku-pptx2md 0.4.1`.
 - `sh scripts/compare-node-java-cli.sh`: passed for the checked upstream
   generated fixture set, summary text, summary JSON, stdout Markdown,
   `--no-notes`, `--debug`, metadata rejection, read failures, and

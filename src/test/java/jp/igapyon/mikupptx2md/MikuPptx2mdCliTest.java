@@ -26,7 +26,7 @@ class MikuPptx2mdCliTest {
     int exitCode = new MikuPptx2mdCli().run(new String[] {"--version"}, new PrintStream(out), new PrintStream(err));
 
     assertEquals(0, exitCode);
-    assertTrue(out.toString().contains("miku-pptx2md 0.4.0"));
+    assertTrue(out.toString().contains("miku-pptx2md 0.4.1"));
     assertEquals("", err.toString());
   }
 
