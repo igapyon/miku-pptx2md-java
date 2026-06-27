@@ -18,16 +18,18 @@ Read this before starting work, before deciding that work is complete, and whene
 ## Objective
 
 Maintain `miku-pptx2md-java` as the Java companion of the upstream TypeScript /
-Node.js `miku-pptx2md` project. The current Java runtime version is `0.4.0`,
-aligned with the checked upstream Node package version.
+Node.js `miku-pptx2md` project. The current Java runtime version is `0.4.1`,
+following the checked upstream Node `0.4.0` package version.
 
 The first version should be good enough for local Java CLI use, basic
 automation, and continued upstream-following maintenance. It does not need to
 claim complete Node / Java parity for every PowerPoint feature.
 
-The first usable Java `0.2.0` milestone is complete. The current goal is to keep
-the Java runtime as close as practical to the current Node version's CLI/core
-behavior.
+The first usable Java `0.2.0` milestone is complete. Java `0.4.0` aligned the
+runtime with the checked upstream Node `0.4.0` representative behavior. The
+current goal is to continue low-risk refactoring of the Java core so future
+Node-parity work can be added without growing `MikuPptx2mdCore` into a
+hard-to-maintain monolith.
 
 ## Done
 
@@ -51,18 +53,24 @@ behavior.
 - A release workflow is present for CLI runtime release assets.
 - Java `0.4.0` follows the checked upstream Node `0.4.0` representative
   fixture and CLI behavior.
+- Java `0.4.1` preserves the `0.4.0` behavior while starting focused
+  refactoring; report generation is extracted from the core converter.
 - Remaining parity work is explicitly listed in `TODO.md` or
   `docs/remaining-migration-items.md`.
 
 ## Next Goal
 
-- Bring Java behavior as close as practical to the upstream Node version.
-- Expand Node / Java parity fixtures and comparison scripts.
-- Resolve or explicitly document remaining differences in Markdown output,
-  summary JSON, diagnostics, asset manifest output, and supported PPTX feature
-  handling.
-- Keep the Java runtime version aligned when the checked upstream Node package
-  version is intentionally adopted.
+- Continue staged refactoring without changing public CLI/core behavior.
+- Keep `MikuPptx2mdCore` as the orchestration entry point while extracting
+  cohesive responsibilities into package-private collaborators.
+- Prefer the next refactoring cuts in this order:
+  1. PPTX package and relationship reading.
+  2. slide/text/table/image extraction.
+  3. Markdown rendering.
+  4. internal slide/block models when extraction makes them reusable.
+- After each refactoring step, run `mvn test` and, when versioned output or
+  packaging is affected, `mvn package` plus a runtime jar smoke command.
+- Continue Node-parity work only after preserving current tests and behavior.
 
 ## Stop
 

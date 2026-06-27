@@ -58,6 +58,12 @@ Update this section while working. Do not rewrite unrelated TODO items.
   `[input] read failed:` message shape.
 - [x] Bump the Java runtime version to `0.4.0` to align with the checked
   upstream Node package version.
+- [x] Bump the Java runtime patch version to `0.4.1` and extract summary /
+  JSON report generation from the core converter.
+- [ ] Continue staged core refactoring under the current `GOAL.md`: extract
+  PPTX package / relationship reading next while preserving CLI/core behavior.
+- [ ] After the next refactoring step, run `mvn test`; run `mvn package` and a
+  jar smoke command if packaging or version-visible behavior changes.
 
 ### Blockers
 

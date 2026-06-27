@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class MikuPptx2mdCli {
-  public static final String VERSION = "0.4.0";
+  public static final String VERSION = "0.4.1";
 
   public static void main(String[] args) {
     int exitCode = new MikuPptx2mdCli().run(args, System.out, System.err);

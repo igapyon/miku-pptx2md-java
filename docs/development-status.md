@@ -77,6 +77,6 @@ Primary command:
 ```bash
 mvn test
 mvn package
-java -jar target/miku-pptx2md-0.4.0.jar --version
+java -jar target/miku-pptx2md-0.4.1.jar --version
 sh scripts/compare-node-java-cli.sh
 ```
