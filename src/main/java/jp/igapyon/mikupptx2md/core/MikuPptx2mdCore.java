@@ -2,27 +2,20 @@ package jp.igapyon.mikupptx2md.core;
 
 import jp.igapyon.mikupptx2md.xml.XmlUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class MikuPptx2mdCore {
   public Pptx2MdResult convertPptxToMarkdown(byte[] bytes, Pptx2MdOptions options) {
     Pptx2MdOptions effectiveOptions = options == null ? new Pptx2MdOptions() : options;
-    Map<String, byte[]> entries = readZipEntries(bytes);
+    PptxPackage pptx = PptxPackage.read(bytes);
     Pptx2MdResult result = new Pptx2MdResult();
-    parseCoreProperties(entries, result.metadata);
+    parseCoreProperties(pptx, result.metadata);
 
-    List<SlideModel> slides = parseSlides(entries, result.diagnostics);
+    List<SlideModel> slides = parseSlides(pptx, result.diagnostics);
     result.assets.addAll(collectAssets(slides));
     result.markdown = renderMarkdown(resolveTitle(result.metadata, effectiveOptions), slides, result.diagnostics, effectiveOptions);
     fillSummary(result.summary, slides, result.assets, result.diagnostics);
@@ -41,30 +34,8 @@ public class MikuPptx2mdCore {
     return Pptx2MdReportWriter.createAssetsManifestJsonText(assets);
   }
 
-  private static Map<String, byte[]> readZipEntries(byte[] bytes) {
-    Map<String, byte[]> entries = new LinkedHashMap<String, byte[]>();
-    try {
-      ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bytes));
-      ZipEntry entry;
-      while ((entry = zip.getNextEntry()) != null) {
-        if (!entry.isDirectory()) {
-          ByteArrayOutputStream out = new ByteArrayOutputStream();
-          byte[] buffer = new byte[8192];
-          int length;
-          while ((length = zip.read(buffer)) >= 0) {
-            out.write(buffer, 0, length);
-          }
-          entries.put(entry.getName(), out.toByteArray());
-        }
-      }
-      return entries;
-    } catch (IOException e) {
-      throw new IllegalArgumentException("ZIP end of central directory was not found.", e);
-    }
-  }
-
-  private static void parseCoreProperties(Map<String, byte[]> entries, Map<String, String> metadata) {
-    String xml = readTextEntry(entries, "docProps/core.xml");
+  private static void parseCoreProperties(PptxPackage pptx, Map<String, String> metadata) {
+    String xml = pptx.readTextEntry("docProps/core.xml");
     if (xml == null) {
       return;
     }
@@ -95,14 +66,13 @@ public class MikuPptx2mdCore {
     return value.length() > 0 ? value : null;
   }
 
-  private static List<SlideModel> parseSlides(Map<String, byte[]> entries, List<Pptx2MdDiagnostic> diagnostics) {
-    String presentationXml = readTextEntry(entries, "ppt/presentation.xml");
-    String presentationRelsXml = readTextEntry(entries, "ppt/_rels/presentation.xml.rels");
-    if (presentationXml == null || presentationRelsXml == null) {
+  private static List<SlideModel> parseSlides(PptxPackage pptx, List<Pptx2MdDiagnostic> diagnostics) {
+    String presentationXml = pptx.readTextEntry("ppt/presentation.xml");
+    if (presentationXml == null || pptx.readTextEntry("ppt/_rels/presentation.xml.rels") == null) {
       throw new IllegalArgumentException("Required PPTX presentation parts were not found.");
     }
 
-    Map<String, RelationshipEntry> rels = parseRelationshipMap(presentationRelsXml, "ppt");
+    Map<String, RelationshipEntry> rels = pptx.readRelationshipMap("ppt/_rels/presentation.xml.rels", "ppt");
     List<String> slideRelIds = new ArrayList<String>();
     Matcher matcher = Pattern.compile("<[^<\\s:]*:?sldId\\b[^>]*>").matcher(presentationXml);
     while (matcher.find()) {
@@ -122,44 +92,65 @@ public class MikuPptx2mdCore {
         slides.add(new SlideModel(i + 1, ""));
         continue;
       }
-      String slideXml = readTextEntry(entries, slideRel.target);
+      String slideXml = pptx.readTextEntry(slideRel.target);
       if (slideXml == null) {
         diagnostics.add(new Pptx2MdDiagnostic("warning", "missing-slide-part",
             "Slide part was not found: " + slideRel.target, slideRel.target));
         slides.add(new SlideModel(i + 1, slideRel.target));
         continue;
       }
-      List<RelationshipEntry> slideRelationships = parseSlideRelationships(entries, slideRel.target);
-      addUnsupportedSlideCommentDiagnostics(slideRelationships, slideRel.target, diagnostics);
-      List<TextParagraph> notes = parseSlideNotes(entries, slideRel.target, slideRelationships, diagnostics);
-      slides.add(parseSlideXml(slideXml, slideRel.target, i + 1, notes, slideRelationships, entries, diagnostics));
+      List<RelationshipEntry> slideRelationships = pptx.readPartRelationships(slideRel.target);
+      List<SlideComment> comments = parseSlideComments(pptx, slideRel.target, slideRelationships, diagnostics);
+      List<TextParagraph> notes = parseSlideNotes(pptx, slideRel.target, slideRelationships, diagnostics);
+      slides.add(parseSlideXml(slideXml, slideRel.target, i + 1, notes, comments, slideRelationships, pptx, diagnostics));
     }
     return slides;
   }
 
-  private static void addUnsupportedSlideCommentDiagnostics(List<RelationshipEntry> relationships, String slidePath,
-      List<Pptx2MdDiagnostic> diagnostics) {
+  private static List<SlideComment> parseSlideComments(PptxPackage pptx, String slidePath,
+      List<RelationshipEntry> relationships, List<Pptx2MdDiagnostic> diagnostics) {
+    List<SlideComment> comments = new ArrayList<SlideComment>();
+    String slideRelsPath = pptx.buildRelationshipsPath(slidePath);
     for (RelationshipEntry relationship : relationships) {
-      if (relationship.type.endsWith("/comments")) {
-        diagnostics.add(new Pptx2MdDiagnostic("warning", "unsupported-comments",
-            "PowerPoint slide comments were found but are not converted to Markdown: " + relationship.target, slidePath));
+      if (!relationship.type.endsWith("/comments")) {
+        continue;
       }
+      String commentsXml = pptx.readTextEntry(relationship.target);
+      if (commentsXml == null) {
+        diagnostics.add(new Pptx2MdDiagnostic("warning", "missing-comments-part",
+            "Slide comments part was not found: " + relationship.target, slideRelsPath));
+        continue;
+      }
+      comments.addAll(parseSlideCommentsXml(commentsXml, comments.size()));
     }
+    return comments;
   }
 
-  private static List<RelationshipEntry> parseSlideRelationships(Map<String, byte[]> entries, String slidePath) {
-    String relsXml = readTextEntry(entries, buildRelationshipsPath(slidePath));
-    return relsXml == null ? new ArrayList<RelationshipEntry>() : parseRelationshipEntries(relsXml, getPackageDir(slidePath));
+  private static List<SlideComment> parseSlideCommentsXml(String xml, int offset) {
+    List<SlideComment> comments = new ArrayList<SlideComment>();
+    List<String> commentBlocks = XmlUtils.collectTagBlocks(xml, "cm");
+    for (int i = 0; i < commentBlocks.size(); i++) {
+      String commentXml = commentBlocks.get(i);
+      String text = readElementText(commentXml, "text");
+      if (text == null || text.length() == 0) {
+        continue;
+      }
+      String commentTag = XmlUtils.firstTag(commentXml, "cm");
+      String authorId = commentTag == null ? null : XmlUtils.getAttribute(commentTag, "authorId");
+      String date = commentTag == null ? null : XmlUtils.getAttribute(commentTag, "dt");
+      comments.add(new SlideComment("comment-" + (offset + i + 1), text, authorId, date));
+    }
+    return comments;
   }
 
-  private static List<TextParagraph> parseSlideNotes(Map<String, byte[]> entries, String slidePath,
+  private static List<TextParagraph> parseSlideNotes(PptxPackage pptx, String slidePath,
       List<RelationshipEntry> relationships, List<Pptx2MdDiagnostic> diagnostics) {
     for (RelationshipEntry rel : relationships) {
       if (rel.type.endsWith("/notesSlide")) {
-        String notesXml = readTextEntry(entries, rel.target);
+        String notesXml = pptx.readTextEntry(rel.target);
         if (notesXml == null) {
           diagnostics.add(new Pptx2MdDiagnostic("warning", "missing-notes-part",
-              "Notes slide part was not found: " + rel.target, buildRelationshipsPath(slidePath)));
+              "Notes slide part was not found: " + rel.target, pptx.buildRelationshipsPath(slidePath)));
           return new ArrayList<TextParagraph>();
         }
         List<TextParagraph> notes = new ArrayList<TextParagraph>();
@@ -180,9 +171,10 @@ public class MikuPptx2mdCore {
   }
 
   private static SlideModel parseSlideXml(String xml, String slidePath, int index, List<TextParagraph> notes,
-      List<RelationshipEntry> relationships, Map<String, byte[]> entries, List<Pptx2MdDiagnostic> diagnostics) {
+      List<SlideComment> comments, List<RelationshipEntry> relationships, PptxPackage pptx, List<Pptx2MdDiagnostic> diagnostics) {
     SlideModel slide = new SlideModel(index, slidePath);
     slide.notes.addAll(notes);
+    slide.comments.addAll(comments);
     List<SlideElement> elements = collectSlideContentElements(xml);
     for (SlideElement element : elements) {
       if ("graphicFrame".equals(element.kind)) {
@@ -202,7 +194,7 @@ public class MikuPptx2mdCore {
       }
 
       if ("pic".equals(element.kind)) {
-        ImageBlock image = parsePictureImage(element.xml, relationships, entries, slidePath, index, slide.blocks.size(), diagnostics);
+        ImageBlock image = parsePictureImage(element.xml, relationships, pptx, slidePath, index, slide.blocks.size(), diagnostics);
         if (image != null) {
           slide.blocks.add(image);
         } else {
@@ -335,7 +327,7 @@ public class MikuPptx2mdCore {
   }
 
   private static ImageBlock parsePictureImage(String pictureXml, List<RelationshipEntry> relationships,
-      Map<String, byte[]> entries, String slidePath, int slideIndex, int blockIndex, List<Pptx2MdDiagnostic> diagnostics) {
+      PptxPackage pptx, String slidePath, int slideIndex, int blockIndex, List<Pptx2MdDiagnostic> diagnostics) {
     String blipTag = XmlUtils.firstTag(pictureXml, "blip");
     if (blipTag == null) {
       return null;
@@ -347,7 +339,7 @@ public class MikuPptx2mdCore {
           "Image relationship was not found: " + relId, slidePath));
       return null;
     }
-    byte[] assetBytes = entries.get(imageRel.target);
+    byte[] assetBytes = pptx.readBinaryEntry(imageRel.target);
     if (assetBytes == null) {
       diagnostics.add(new Pptx2MdDiagnostic("warning", "missing-image-part",
           "Image part was not found: " + imageRel.target, slidePath));
@@ -368,6 +360,9 @@ public class MikuPptx2mdCore {
   private static String renderMarkdown(String title, List<SlideModel> slides, List<Pptx2MdDiagnostic> diagnostics,
       Pptx2MdOptions options) {
     StringBuilder builder = new StringBuilder();
+    if (shouldIncludeFrontMatter(options)) {
+      builder.append(createFrontMatter(title, options)).append("\n\n");
+    }
     builder.append("# ").append(title).append("\n\n");
     for (SlideModel slide : slides) {
       builder.append("## Slide ").append(slide.index);
@@ -383,6 +378,14 @@ public class MikuPptx2mdCore {
         for (TextParagraph note : slide.notes) {
           builder.append(note.markdown).append("\n\n");
         }
+      }
+      if (!slide.comments.isEmpty()) {
+        builder.append("### Comments\n\n");
+        for (SlideComment comment : slide.comments) {
+          builder.append("- [").append(escapeMarkdownText(comment.label)).append("] ")
+              .append(escapeMarkdownText(comment.text)).append("\n");
+        }
+        builder.append('\n');
       }
     }
     if (options.includeUnsupportedComments && !diagnostics.isEmpty()) {
@@ -402,6 +405,26 @@ public class MikuPptx2mdCore {
     return builder.toString();
   }
 
+  private static boolean shouldIncludeFrontMatter(Pptx2MdOptions options) {
+    return options.frontMatter != null && !"exclude".equals(String.valueOf(options.frontMatter));
+  }
+
+  private static String createFrontMatter(String title, Pptx2MdOptions options) {
+    return "---\n"
+        + "title: " + quoteYamlString(title) + "\n"
+        + "type: converted\n"
+        + "conversion:\n"
+        + "  tool: miku-pptx2md\n"
+        + "  version: " + quoteYamlString(options.toolVersion == null ? "unknown" : options.toolVersion) + "\n"
+        + "  notes: " + (options.includeNotes ? "include" : "exclude") + "\n"
+        + "  unsupported_comments: " + (options.includeUnsupportedComments ? "include" : "exclude") + "\n"
+        + "---";
+  }
+
+  private static String quoteYamlString(String value) {
+    return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\r", "\\r").replace("\n", "\\n") + "\"";
+  }
+
   private static void fillSummary(Pptx2MdSummary summary, List<SlideModel> slides, List<Pptx2MdAsset> assets,
       List<Pptx2MdDiagnostic> diagnostics) {
     summary.slides = slides.size();
@@ -410,7 +433,8 @@ public class MikuPptx2mdCore {
     for (SlideModel slide : slides) {
       if (slide.title != null && slide.title.length() > 0) summary.slidesWithTitles++;
       if (!slide.notes.isEmpty()) summary.notesSlides++;
-      summary.textBlocks += slide.notes.size();
+      summary.comments += slide.comments.size();
+      summary.textBlocks += slide.notes.size() + slide.comments.size();
       for (SlideBlock block : slide.blocks) {
         summary.textBlocks += block.textBlockCount();
         summary.listItems += block.listItemCount();
@@ -436,11 +460,6 @@ public class MikuPptx2mdCore {
     return assets;
   }
 
-  private static String readTextEntry(Map<String, byte[]> entries, String path) {
-    byte[] bytes = entries.get(path);
-    return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
-  }
-
   private static String resolveTitle(Map<String, String> metadata, Pptx2MdOptions options) {
     if (options.title != null && options.title.length() > 0) return options.title;
     if (metadata.containsKey("title")) return metadata.get("title");
@@ -451,42 +470,6 @@ public class MikuPptx2mdCore {
   private static String getRelationshipId(String tag) {
     Matcher matcher = Pattern.compile("\\sr:(?:id|embed)=\"([^\"]*)\"").matcher(tag);
     return matcher.find() ? matcher.group(1) : null;
-  }
-
-  private static Map<String, RelationshipEntry> parseRelationshipMap(String xml, String baseDir) {
-    Map<String, RelationshipEntry> map = new LinkedHashMap<String, RelationshipEntry>();
-    for (RelationshipEntry entry : parseRelationshipEntries(xml, baseDir)) {
-      map.put(entry.id, entry);
-    }
-    return map;
-  }
-
-  private static List<RelationshipEntry> parseRelationshipEntries(String xml, String baseDir) {
-    List<RelationshipEntry> rels = new ArrayList<RelationshipEntry>();
-    Matcher matcher = Pattern.compile("<[^<\\s:]*:?Relationship\\b[^>]*>").matcher(xml);
-    while (matcher.find()) {
-      String tag = matcher.group();
-      String id = XmlUtils.getAttribute(tag, "Id");
-      String type = XmlUtils.getAttribute(tag, "Type");
-      String target = XmlUtils.getAttribute(tag, "Target");
-      String targetMode = XmlUtils.getAttribute(tag, "TargetMode");
-      if (id != null && target != null) {
-        rels.add(new RelationshipEntry(id, type == null ? "" : type,
-            "External".equals(targetMode) ? target : XmlUtils.normalizePackagePath(baseDir, target), targetMode));
-      }
-    }
-    return rels;
-  }
-
-  private static String buildRelationshipsPath(String partPath) {
-    String dir = getPackageDir(partPath);
-    String fileName = dir.length() > 0 ? partPath.substring(dir.length() + 1) : partPath;
-    return dir.length() > 0 ? dir + "/_rels/" + fileName + ".rels" : "_rels/" + fileName + ".rels";
-  }
-
-  private static String getPackageDir(String partPath) {
-    int index = partPath.lastIndexOf('/');
-    return index >= 0 ? partPath.substring(0, index) : "";
   }
 
   private static boolean isTitleShape(String shapeXml) {
@@ -594,6 +577,10 @@ public class MikuPptx2mdCore {
     return text.replace("\\", "\\\\").replace("[", "\\[").replace("]", "\\]");
   }
 
+  private static String escapeMarkdownText(String text) {
+    return escapeMarkdownLinkLabel(text);
+  }
+
   private static String escapeMarkdownLinkDestination(String text) {
     return text.replace(")", "%29").replace("(", "%28");
   }
@@ -633,26 +620,13 @@ public class MikuPptx2mdCore {
     return builder.toString();
   }
 
-  private static class RelationshipEntry {
-    final String id;
-    final String type;
-    final String target;
-    final String targetMode;
-
-    RelationshipEntry(String id, String type, String target, String targetMode) {
-      this.id = id;
-      this.type = type;
-      this.target = target;
-      this.targetMode = targetMode;
-    }
-  }
-
   private static class SlideModel {
     final int index;
     final String path;
     String title;
     final List<SlideBlock> blocks = new ArrayList<SlideBlock>();
     final List<TextParagraph> notes = new ArrayList<TextParagraph>();
+    final List<SlideComment> comments = new ArrayList<SlideComment>();
 
     SlideModel(int index, String path) {
       this.index = index;
@@ -848,6 +822,20 @@ public class MikuPptx2mdCore {
     int hyperlinkCount;
     String listKind;
     int level;
+  }
+
+  private static class SlideComment {
+    final String label;
+    final String text;
+    final String authorId;
+    final String date;
+
+    SlideComment(String label, String text, String authorId, String date) {
+      this.label = label;
+      this.text = text;
+      this.authorId = authorId;
+      this.date = date;
+    }
   }
 
   private static class TextRun {

@@ -46,20 +46,24 @@ Implemented:
 - image asset export through optional `--assets-dir`
 - speaker notes extraction
 - shape-text block rendering for ordinary preset shapes
-- unsupported chart, SmartArt, comments, video, audio, and OLE diagnostics
+- slide comments rendered as Markdown comment sections
+- unsupported chart, SmartArt, video, audio, and OLE diagnostics
 - Markdown output
+- YAML front matter output from the CLI by default, with `--front-matter exclude`
 - summary text and summary JSON output
 - CLI `--help`, `--version`, `--out`, `--assets-dir`, `--summary`,
-  `--summary-out`, `--summary-json-out`, `--no-notes`, `--debug`, and
-  `--verbose`
+  `--summary-out`, `--summary-json-out`, `--front-matter`, `--no-notes`,
+  `--debug`, and `--verbose`
 - release workflow for CLI runtime assets
 - representative Node core and CLI test intent coverage for the checked
-  upstream Node `0.4.0`
+  upstream Node `0.5.1`
 - direct Node / Java CLI output comparison script for the checked upstream
   generated fixture set, including Markdown, summary JSON, asset manifest, and
   asset bytes
 - phase 2 CLI parity checks for summary text, stdout Markdown, `--no-notes`,
   `--debug`, metadata command rejection, and read-failure diagnostics
+- package-private `PptxPackage` and `RelationshipEntry` collaborators for
+  PPTX ZIP entry loading and relationship parsing
 
 Not yet implemented:
 
@@ -77,6 +81,6 @@ Primary command:
 ```bash
 mvn test
 mvn package
-java -jar target/miku-pptx2md-0.4.1.jar --version
+java -jar target/miku-pptx2md-0.5.1.jar --version
 sh scripts/compare-node-java-cli.sh
 ```

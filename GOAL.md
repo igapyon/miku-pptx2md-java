@@ -18,18 +18,20 @@ Read this before starting work, before deciding that work is complete, and whene
 ## Objective
 
 Maintain `miku-pptx2md-java` as the Java companion of the upstream TypeScript /
-Node.js `miku-pptx2md` project. The current Java runtime version is `0.4.1`,
-following the checked upstream Node `0.4.0` package version.
+Node.js `miku-pptx2md` project. The current Java runtime version is `0.5.1`,
+following the checked upstream Node `0.5.1` package version.
 
 The first version should be good enough for local Java CLI use, basic
 automation, and continued upstream-following maintenance. It does not need to
 claim complete Node / Java parity for every PowerPoint feature.
 
 The first usable Java `0.2.0` milestone is complete. Java `0.4.0` aligned the
-runtime with the checked upstream Node `0.4.0` representative behavior. The
-current goal is to continue low-risk refactoring of the Java core so future
-Node-parity work can be added without growing `MikuPptx2mdCore` into a
-hard-to-maintain monolith.
+runtime with the checked upstream Node `0.4.0` representative behavior. Java
+`0.5.1` follows the checked upstream Node `0.5.1` representative behavior,
+including YAML front matter and slide comment rendering. The current goal is
+to continue low-risk refactoring of the Java core so future Node-parity work
+can be added without growing `MikuPptx2mdCore` into a hard-to-maintain
+monolith.
 
 ## Done
 
@@ -55,6 +57,9 @@ hard-to-maintain monolith.
   fixture and CLI behavior.
 - Java `0.4.1` preserves the `0.4.0` behavior while starting focused
   refactoring; report generation is extracted from the core converter.
+- Java `0.5.1` follows the checked upstream Node `0.5.1` representative
+  fixture and CLI behavior for front matter, slide comments, summaries, and
+  artifact projection shape.
 - Remaining parity work is explicitly listed in `TODO.md` or
   `docs/remaining-migration-items.md`.
 

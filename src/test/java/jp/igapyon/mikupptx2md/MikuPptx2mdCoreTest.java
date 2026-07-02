@@ -36,6 +36,29 @@ class MikuPptx2mdCoreTest {
     assertTrue(summary.contains("metadata.title: Sample Deck"));
     assertTrue(summary.contains("slides: 1"));
     assertTrue(summary.contains("textBlocks: 1"));
+    assertTrue(summary.contains("comments: 0"));
+  }
+
+  @Test
+  void canIncludeYamlFrontMatterWhenRequested() throws Exception {
+    Pptx2MdOptions options = new Pptx2MdOptions();
+    options.title = "sample.pptx";
+    options.frontMatter = "include";
+    options.toolVersion = "0.5.1";
+    options.includeUnsupportedComments = true;
+    Pptx2MdResult result = new MikuPptx2mdCore().convertPptxToMarkdown(basicPptx(), options);
+
+    assertTrue(result.markdown.startsWith("---\n"
+        + "title: \"sample.pptx\"\n"
+        + "type: converted\n"
+        + "conversion:\n"
+        + "  tool: miku-pptx2md\n"
+        + "  version: \"0.5.1\"\n"
+        + "  notes: include\n"
+        + "  unsupported_comments: include\n"
+        + "---\n\n"
+        + "# sample.pptx\n\n"
+        + "## Slide 1: Opening"));
   }
 
   private static byte[] basicPptx() throws Exception {

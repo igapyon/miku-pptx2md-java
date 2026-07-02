@@ -10,6 +10,7 @@ The Java CLI follows the upstream Node CLI where implemented.
 | `--summary` | Implemented | Prints summary text to stdout |
 | `--summary-out <file>` | Implemented | Writes summary text |
 | `--summary-json-out <file>` | Implemented | Writes structured summary JSON |
+| `--front-matter <mode>` | Implemented | `include` or `exclude`; CLI default is `include` |
 | `--no-notes` | Implemented | Omits speaker notes from Markdown |
 | `--debug` | Implemented | Adds diagnostic HTML comments |
 | `--include-unsupported-comments` | Implemented | Alias for `--debug` |
@@ -29,7 +30,8 @@ The Java `--help` output follows the upstream Node agent-readable help shape:
 
 - `USAGE`: adapted for `java -jar target/miku-pptx2md-<version>.jar`
 - `CONTRACT`: aligned with Node
-- `OPTIONS`: aligned for implemented options, including `--assets-dir`
+- `OPTIONS`: aligned for implemented options, including `--assets-dir` and
+  `--front-matter`
 - `OUTPUTS`: aligned with Node concepts, including asset directory and asset
   manifest
 - `EXAMPLES`: adapted for Java jar execution, including asset export
@@ -37,7 +39,7 @@ The Java `--help` output follows the upstream Node agent-readable help shape:
 
 Known intentional differences:
 
-- Version output uses the Java runtime version, currently `0.4.1`. The checked
-  upstream Node package version for this mapping remains `0.4.0`.
+- Version output uses the Java runtime version, currently `0.5.1`. The checked
+  upstream Node package version for this mapping is `0.5.1`.
 - Help examples use Java jar invocation rather than
   `node scripts/miku-pptx2md-cli.mjs`.

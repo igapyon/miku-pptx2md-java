@@ -60,8 +60,16 @@ Update this section while working. Do not rewrite unrelated TODO items.
   upstream Node package version.
 - [x] Bump the Java runtime patch version to `0.4.1` and extract summary /
   JSON report generation from the core converter.
+- [x] Extract PPTX package / relationship reading from `MikuPptx2mdCore` into
+  package-private collaborators while preserving CLI/core behavior.
+- [x] After the PPTX package / relationship refactoring step, run `mvn test`.
+- [x] Check the updated upstream Node `0.5.1` version and identify Java impact:
+  YAML front matter, slide comment rendering, summary `comments`, and artifact
+  projection separation.
+- [x] Align Java CLI/core/tests/docs to the checked upstream Node `0.5.1`
+  representative behavior.
 - [ ] Continue staged core refactoring under the current `GOAL.md`: extract
-  PPTX package / relationship reading next while preserving CLI/core behavior.
+  slide/text/table/image extraction next while preserving CLI/core behavior.
 - [ ] After the next refactoring step, run `mvn test`; run `mvn package` and a
   jar smoke command if packaging or version-visible behavior changes.
 

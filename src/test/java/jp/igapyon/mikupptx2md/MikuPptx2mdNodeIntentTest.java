@@ -144,7 +144,9 @@ class MikuPptx2mdNodeIntentTest {
     assertTrue(debug.markdown.contains("<!-- warning: missing-image-part source=ppt/slides/slide1.xml:"));
 
     Pptx2MdResult comments = convert(PptxFixtures.comments(), "comment-sample");
-    assertEquals("unsupported-comments", comments.diagnostics.get(0).code);
+    assertTrue(comments.markdown.contains("### Comments\n\n- [comment-1] Review note"));
+    assertEquals(1, comments.summary.comments);
+    assertEquals(0, comments.summary.diagnostics);
   }
 
   @Test
