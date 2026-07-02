@@ -30,7 +30,7 @@ remaining parity work in `TODO.md` and `docs/remaining-migration-items.md`.
 
 ## First-Version Scope
 
-The current `0.4.1` Java version follows the checked upstream Node `0.4.0`
+The current `0.5.1` Java version follows the checked upstream Node `0.5.1`
 version's representative behavior:
 
 - Markdown sections for ordered slides
@@ -42,8 +42,10 @@ version's representative behavior:
 - speaker notes by default, with `--no-notes` support
 - image relationship discovery and image summary metadata
 - sidecar image asset export with `--assets-dir` and `manifest.json`
-- unsupported chart, SmartArt, comments, video, audio, and OLE diagnostics
+- slide comments rendered as Markdown comment sections
+- unsupported chart, SmartArt, video, audio, and OLE diagnostics
 - summary text and summary JSON outputs
+- YAML front matter by default in CLI output, with `--front-matter exclude`
 - agent-readable CLI help, version, verbose output, and debug comments
 
 Known first-version differences:
@@ -69,19 +71,19 @@ The executable CLI jar is produced under `target/`.
 ## Java CLI
 
 ```bash
-java -jar target/miku-pptx2md-0.4.1.jar ./sample.pptx --out ./sample.md
+java -jar target/miku-pptx2md-0.5.1.jar ./sample.pptx --out ./sample.md
 ```
 
 When `--out` is omitted, Markdown is written to stdout.
 
 ```bash
-java -jar target/miku-pptx2md-0.4.1.jar ./sample.pptx > ./sample.md
+java -jar target/miku-pptx2md-0.5.1.jar ./sample.pptx > ./sample.md
 ```
 
 Summary outputs:
 
 ```bash
-java -jar target/miku-pptx2md-0.4.1.jar \
+java -jar target/miku-pptx2md-0.5.1.jar \
   ./sample.pptx \
   --out ./sample.md \
   --summary-out ./sample.summary.txt \
@@ -95,6 +97,7 @@ CLI options:
 - `--summary`: Print summary text to stdout
 - `--summary-out <file>`: Write summary text to this file
 - `--summary-json-out <file>`: Write structured summary JSON to this file
+- `--front-matter <mode>`: `include` or `exclude`; default is `include`
 - `--no-notes`: Omit speaker notes from Markdown output
 - `--debug`: Include diagnostic HTML comment traces in Markdown
 - `--verbose`: Write progress diagnostics to stderr

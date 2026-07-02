@@ -7,8 +7,11 @@ The upstream semantic source is the TypeScript / Node.js main application:
 - Branch checked during initial Java creation: `devel-tiga0626acc`
 - Commit checked during initial Java creation:
   `53067f5bf3bb95018737e6631c02ebc81a643865`
-- Upstream package version observed: `0.4.0`
-- Checked date: 2026-06-27
+- Current checked upstream branch: `devel-tiga0702wab`
+- Current checked upstream commit:
+  `422e114`
+- Upstream package version observed: `0.5.1`
+- Checked date: 2026-07-02
 
 The precise compatibility target should be pinned again before claiming full
 Node / Java parity.

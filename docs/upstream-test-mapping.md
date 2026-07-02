@@ -6,10 +6,10 @@
 | Core summary text exposes metadata and counts | `MikuPptx2mdCoreTest.createsSummaryText` | Initial Java fixture |
 | CLI `--version` contract | `MikuPptx2mdCliTest.printsVersion` | Covered |
 | CLI metadata command exclusivity | `MikuPptx2mdCliTest.rejectsMixedVersion` | Covered |
-| Node fixture parity from `tests/pptx2md-core.test.mjs` | `MikuPptx2mdNodeIntentTest` | Representative upstream `0.4.0` slice covered |
-| Node CLI output parity from `tests/pptx2md-cli.test.mjs` | `MikuPptx2mdCliTest` | Representative upstream `0.4.0` slice covered |
+| Node fixture parity from `tests/pptx2md-core.test.mjs` | `MikuPptx2mdNodeIntentTest` | Representative upstream `0.5.1` slice covered |
+| Node CLI output parity from `tests/pptx2md-cli.test.mjs` | `MikuPptx2mdCliTest` | Representative upstream `0.5.1` slice covered |
 
-## Representative Upstream 0.4.0 Node Intent Slice
+## Representative Upstream 0.5.1 Node Intent Slice
 
 The first Java parity slice follows these upstream Node test intents:
 
@@ -24,7 +24,7 @@ The first Java parity slice follows these upstream Node test intents:
 - speaker notes inclusion and `includeNotes=false`
 - image relationship discovery, placeholder rendering, asset metadata, and byte retention
 - missing image diagnostic and debug comment rendering
-- unsupported slide comments diagnostic
+- slide comments rendered as Markdown comment sections
 - unsupported video, audio, and OLE picture diagnostics
 
 The first Java CLI parity slice follows these upstream Node CLI test intents:
@@ -35,6 +35,7 @@ The first Java CLI parity slice follows these upstream Node CLI test intents:
 - Markdown and summary files are written to requested paths
 - verbose diagnostics are written to stderr
 - structured summary JSON is written to a requested path
+- `--front-matter include|exclude` controls YAML front matter
 - debug mode includes diagnostic comments in Markdown
 - `--assets-dir` writes image assets, `manifest.json`, and relative Markdown
   image links

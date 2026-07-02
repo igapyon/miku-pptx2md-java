@@ -5,6 +5,8 @@ import java.util.function.Function;
 public class Pptx2MdOptions {
   public String title;
   public String fallbackTitle;
+  public String frontMatter;
+  public String toolVersion;
   public boolean includeNotes = true;
   public boolean includeUnsupportedComments = false;
   public Function<Pptx2MdAsset, String> imagePathResolver;

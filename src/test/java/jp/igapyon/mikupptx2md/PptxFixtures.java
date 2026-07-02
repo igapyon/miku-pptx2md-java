@@ -142,9 +142,12 @@ final class PptxFixtures {
   }
 
   static byte[] comments() throws Exception {
-    return zip(base("Comment Slide",
+    Map<String, Object> files = base("Comment Slide",
         "<p:sp><p:txBody><a:p><a:r><a:t>Visible slide body</a:t></a:r></a:p></p:txBody></p:sp>",
-        "<Relationship Id=\"rIdComments1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments/comment1.xml\"/>"));
+        "<Relationship Id=\"rIdComments1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments/comment1.xml\"/>");
+    files.put("ppt/comments/comment1.xml",
+        "<p:cmLst xmlns:p=\"p\"><p:cm authorId=\"0\" dt=\"2026-07-02T10:00:00Z\"><p:text>Review note</p:text></p:cm></p:cmLst>");
+    return zip(files);
   }
 
   static byte[] unsupportedPicture(String kind) throws Exception {

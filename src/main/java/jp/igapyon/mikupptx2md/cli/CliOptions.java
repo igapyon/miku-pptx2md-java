@@ -6,6 +6,7 @@ class CliOptions {
   String assetsDirPath;
   String summaryOutPath;
   String summaryJsonOutPath;
+  String frontMatter = "include";
   boolean summary;
   boolean includeNotes = true;
   boolean includeUnsupportedComments;
@@ -54,6 +55,12 @@ class CliOptions {
         options.summaryJsonOutPath = requireValue(args, ++i, arg);
       } else if ("--assets-dir".equals(arg)) {
         options.assetsDirPath = requireValue(args, ++i, arg);
+      } else if ("--front-matter".equals(arg)) {
+        String value = requireValue(args, ++i, arg);
+        if (!"include".equals(value) && !"exclude".equals(value)) {
+          throw new IllegalArgumentException("Invalid front matter mode: " + value);
+        }
+        options.frontMatter = value;
       } else {
         throw new IllegalArgumentException("Unknown option: " + arg);
       }

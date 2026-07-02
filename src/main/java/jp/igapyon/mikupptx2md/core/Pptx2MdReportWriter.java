@@ -6,7 +6,7 @@ import java.util.Map;
 final class Pptx2MdReportWriter {
   private static final String[] SUMMARY_FIELDS = new String[] {
       "slides", "slidesWithTitles", "textBlocks", "listItems", "tables", "hyperlinks",
-      "imageAssets", "notesSlides", "warnings", "errors", "diagnostics"
+      "imageAssets", "notesSlides", "comments", "warnings", "errors", "diagnostics"
   };
 
   private Pptx2MdReportWriter() {
@@ -59,6 +59,7 @@ final class Pptx2MdReportWriter {
     if ("hyperlinks".equals(field)) return summary.hyperlinks;
     if ("imageAssets".equals(field)) return summary.imageAssets;
     if ("notesSlides".equals(field)) return summary.notesSlides;
+    if ("comments".equals(field)) return summary.comments;
     if ("warnings".equals(field)) return summary.warnings;
     if ("errors".equals(field)) return summary.errors;
     if ("diagnostics".equals(field)) return summary.diagnostics;

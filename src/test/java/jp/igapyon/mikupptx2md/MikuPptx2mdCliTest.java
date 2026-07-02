@@ -26,7 +26,7 @@ class MikuPptx2mdCliTest {
     int exitCode = new MikuPptx2mdCli().run(new String[] {"--version"}, new PrintStream(out), new PrintStream(err));
 
     assertEquals(0, exitCode);
-    assertTrue(out.toString().contains("miku-pptx2md 0.4.1"));
+    assertTrue(out.toString().contains("miku-pptx2md 0.5.1"));
     assertEquals("", err.toString());
   }
 
@@ -74,6 +74,8 @@ class MikuPptx2mdCliTest {
     assertTrue(out.toString().contains("--help and --version are metadata commands and must be used without other arguments."));
     assertTrue(out.toString().contains("Core metadata plus text, list, table, hyperlink, image, notes, and diagnostics counts."));
     assertTrue(out.toString().contains("--summary-json-out <file>"));
+    assertTrue(out.toString().contains("--front-matter <mode>"));
+    assertTrue(out.toString().contains("use --front-matter exclude to omit it"));
     assertTrue(out.toString().contains("Omit speaker notes from Markdown output."));
     assertTrue(out.toString().contains("--include-unsupported-comments"));
     assertTrue(out.toString().contains("manifest.json"));
@@ -105,9 +107,46 @@ class MikuPptx2mdCliTest {
     assertTrue(err.toString().contains("verbose:"));
     assertTrue(err.toString().contains("input=" + input));
     assertTrue(err.toString().contains("converted slides=1 textBlocks=2"));
-    assertTrue(readUtf8(output).contains("## Slide 1: Overview"));
+    assertTrue(readUtf8(output).contains("---\ntitle: \"sample\"\ntype: converted\nconversion:\n  tool: miku-pptx2md\n  version: \"0.5.1\"\n  notes: include\n  unsupported_comments: exclude\n---\n\n# sample\n\n## Slide 1: Overview"));
     assertTrue(readUtf8(summary).contains("slides: 1"));
     assertTrue(readUtf8(summary).contains("textBlocks: 2"));
+    assertTrue(readUtf8(summary).contains("comments: 0"));
+  }
+
+  @Test
+  void omitsFrontMatterWhenRequested() throws Exception {
+    Path input = tempDir.resolve("sample.pptx");
+    Path output = tempDir.resolve("sample.md");
+    Files.write(input, PptxFixtures.minimal());
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ByteArrayOutputStream err = new ByteArrayOutputStream();
+
+    int exitCode = new MikuPptx2mdCli().run(new String[] {
+        input.toString(),
+        "--out", output.toString(),
+        "--front-matter", "exclude"
+    }, new PrintStream(out), new PrintStream(err));
+
+    assertEquals(0, exitCode);
+    String markdown = readUtf8(output);
+    assertEquals(false, markdown.startsWith("---\n"));
+    assertTrue(markdown.startsWith("# sample\n\n## Slide 1: Overview"));
+  }
+
+  @Test
+  void rejectsInvalidFrontMatterMode() throws Exception {
+    Path input = tempDir.resolve("sample.pptx");
+    Files.write(input, PptxFixtures.minimal());
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ByteArrayOutputStream err = new ByteArrayOutputStream();
+
+    int exitCode = new MikuPptx2mdCli().run(new String[] {
+        input.toString(),
+        "--front-matter", "invalid"
+    }, new PrintStream(out), new PrintStream(err));
+
+    assertEquals(1, exitCode);
+    assertTrue(err.toString().contains("Invalid front matter mode: invalid"));
   }
 
   @Test

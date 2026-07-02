@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class MikuPptx2mdCli {
-  public static final String VERSION = "0.4.1";
+  public static final String VERSION = "0.5.1";
 
   public static void main(String[] args) {
     int exitCode = new MikuPptx2mdCli().run(args, System.out, System.err);
@@ -46,6 +46,8 @@ public class MikuPptx2mdCli {
       verbose(err, options, startedAt, "input-bytes=" + inputBytes.length);
       Pptx2MdOptions coreOptions = new Pptx2MdOptions();
       coreOptions.fallbackTitle = inputStem(options.inputPath);
+      coreOptions.frontMatter = options.frontMatter;
+      coreOptions.toolVersion = VERSION;
       coreOptions.includeNotes = options.includeNotes;
       coreOptions.includeUnsupportedComments = options.includeUnsupportedComments;
       final Path resolvedAssetsDir = options.assetsDirPath == null ? null : Paths.get(options.assetsDirPath).toAbsolutePath().normalize();
@@ -200,6 +202,8 @@ public class MikuPptx2mdCli {
         + "      Write summary text to this file. Parent directories are created.\n\n"
         + "  --summary-json-out <file>\n"
         + "      Write structured summary JSON to this file. Parent directories are created.\n\n"
+        + "  --front-matter <mode>\n"
+        + "      include or exclude. Default: include.\n\n"
         + "  --no-notes\n"
         + "      Omit speaker notes from Markdown output.\n\n"
         + "  --debug\n"
@@ -207,15 +211,17 @@ public class MikuPptx2mdCli {
         + "  --include-unsupported-comments\n"
         + "      Alias for --debug.\n\n"
         + "  --verbose\n"
-        + "      Write progress diagnostics to stderr with a \"verbose:\" prefix.\n"
+        + "      Write progress and timing diagnostics to stderr with a \"verbose:\" prefix.\n"
         + "      Primary Markdown and summary outputs are unchanged.\n\n"
         + "  --version\n"
-        + "      Show product name and version, then exit.\n\n"
+        + "      Show product name and package version, then exit.\n\n"
         + "  --help\n"
         + "      Show this help, then exit.\n\n"
         + "OUTPUTS\n"
         + "  Markdown:\n"
-        + "      Main converted presentation structure. Each slide is emitted as a section.\n\n"
+        + "      Main converted presentation structure. Starts with YAML front matter by\n"
+        + "      default; use --front-matter exclude to omit it. Each slide is emitted as\n"
+        + "      a section.\n\n"
         + "  Summary:\n"
         + "      Core metadata plus text, list, table, hyperlink, image, notes, and diagnostics counts.\n\n"
         + "  Asset directory:\n"
@@ -233,6 +239,8 @@ public class MikuPptx2mdCli {
         + "    java -jar target/miku-pptx2md-" + VERSION + ".jar ./sample.pptx --out ./sample.md --summary-out ./sample.summary.txt\n\n"
         + "  Write structured summary JSON:\n"
         + "    java -jar target/miku-pptx2md-" + VERSION + ".jar ./sample.pptx --out ./sample.md --summary-json-out ./sample.summary.json\n\n"
+        + "  Omit YAML front matter:\n"
+        + "    java -jar target/miku-pptx2md-" + VERSION + ".jar ./sample.pptx --out ./sample.md --front-matter exclude\n\n"
         + "  Print a summary:\n"
         + "    java -jar target/miku-pptx2md-" + VERSION + ".jar ./sample.pptx --out ./sample.md --summary\n\n"
         + "  Write Markdown and export image assets:\n"

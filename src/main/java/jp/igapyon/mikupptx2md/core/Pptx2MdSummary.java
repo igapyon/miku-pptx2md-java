@@ -9,6 +9,7 @@ public class Pptx2MdSummary {
   public int hyperlinks;
   public int imageAssets;
   public int notesSlides;
+  public int comments;
   public int warnings;
   public int errors;
   public int diagnostics;
